@@ -1,0 +1,13 @@
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\HomeWork.exe.config
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\HomeWork.exe
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\HomeWork.pdb
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\EntityFramework.dll
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\EntityFramework.xml
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\bin\Debug\ru\EntityFramework.resources.dll
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\obj\Debug\HomeWork.csprojAssemblyReference.cache
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\obj\Debug\HomeWork.csproj.CoreCompileInputs.cache
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\obj\Debug\HomeWork.csproj.CopyComplete
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\obj\Debug\HomeWork.exe
+C:\Users\eky23\source\repos\Pizza19\Lab1\HomeWork\HomeWork\obj\Debug\HomeWork.pdb

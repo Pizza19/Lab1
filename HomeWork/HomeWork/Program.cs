@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Net.Mail;
 using System.ComponentModel.DataAnnotations;
 using HomeWork.Entities;
+using System.Text.RegularExpressions;
+using System.Security.Principal;
 
 namespace HomeWork
 {
@@ -14,24 +16,30 @@ namespace HomeWork
 
         static void Main(string[] args)
         {
+            CheckFields checkFields = new CheckFields();
             string Email;
             string Date;
             string Login;
             string Password;
-            CheckFields checkFields = new CheckFields();
-            do
+            string Phone;
+            if (checkFields.IsUserRoot() == true)
             {
-                Console.Write("Введите логин: ");
-                Login = Console.ReadLine();
-                Console.Write("Введите пароль: ");
-                Password = Console.ReadLine();
-                Console.Write("Введите E-Mail: ");
-                Email = Console.ReadLine();
-                Console.Write("Введите дату: ");
-                Date = (Console.ReadLine());
-            } while (checkFields.IsEmailValid(Email) == false && checkFields.IsDateValid(Date) == false);
-            ;
-            Console.WriteLine("Удачно!");
+                Console.WriteLine("Вы админ");
+            }
+            //do
+            //{
+            //    Console.Write("Введите логин: ");
+            //    Login = Console.ReadLine();
+            //    Console.Write("Введите пароль: ");
+            //    Password = Console.ReadLine();
+            //    Console.Write("Введите E-Mail: ");
+            //    Email = Console.ReadLine();
+            //    Console.Write("Введите дату: ");
+            //    Date = (Console.ReadLine());
+            //    Console.Write("Введите номер телефона: ");
+            //    Phone = (Console.ReadLine());
+            //} while (checkFields.IsPhoneValid(Phone) == false);
+            //Console.WriteLine("Удачно!");
             Console.ReadKey();
         }
     }
@@ -79,7 +87,16 @@ namespace HomeWork
 
         public override bool IsPhoneValid(string phone)
         {
-            throw new NotImplementedException();
+            Regex PhoneNumber = new Regex(@"^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$");
+            MatchCollection match = PhoneNumber.Matches(phone);
+            if (match.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            } 
         }
 
         public override bool IsUserExists(string login, string password)
@@ -97,7 +114,20 @@ namespace HomeWork
 
         public override bool IsUserRoot()
         {
-            throw new NotImplementedException();
+            bool IsAdmin = false;
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                IsAdmin = principal.IsInRole(WindowsBuiltInRole.);
+            }
+            if (IsAdmin == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public override bool IsWebPageAvailable(string url)
