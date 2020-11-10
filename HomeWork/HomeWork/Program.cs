@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Mail;
 using System.ComponentModel.DataAnnotations;
+using HomeWork.Entities;
 
 namespace HomeWork
 {
@@ -83,7 +84,15 @@ namespace HomeWork
 
         public override bool IsUserExists(string login, string password)
         {
-            throw new NotImplementedException();
+            var CurrentUser = AppData.Context.User.Where(c => c.Login == login && c.Password == password).FirstOrDefault();
+            if (CurrentUser == null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public override bool IsUserRoot()
