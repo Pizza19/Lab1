@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Mail;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography;
 
 namespace HomeWork
 {
@@ -38,7 +39,9 @@ namespace HomeWork
     {
         public override string HashPassword(string password)
         {
-            throw new NotImplementedException();
+            var Md5 = MD5.Create();
+            var hash = Md5.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hash);
         }
 
         public override bool IsDatabaseAccessible(string connectionString)
