@@ -8,6 +8,9 @@ using System.ComponentModel.DataAnnotations;
 using HomeWork.Entities;
 using System.Text.RegularExpressions;
 using System.Security.Principal;
+using System.Security.Cryptography;
+using System.Configuration;
+using System.Data.SqlClient;
 
 namespace HomeWork
 {
@@ -22,24 +25,96 @@ namespace HomeWork
             string Login;
             string Password;
             string Phone;
-            if (checkFields.IsUserRoot() == true)
+            string WebSite;
+            string ConnectionString;
+            do
             {
-                Console.WriteLine("Вы админ");
-            }
-            //do
-            //{
-            //    Console.Write("Введите логин: ");
-            //    Login = Console.ReadLine();
-            //    Console.Write("Введите пароль: ");
-            //    Password = Console.ReadLine();
-            //    Console.Write("Введите E-Mail: ");
-            //    Email = Console.ReadLine();
-            //    Console.Write("Введите дату: ");
-            //    Date = (Console.ReadLine());
-            //    Console.Write("Введите номер телефона: ");
-            //    Phone = (Console.ReadLine());
-            //} while (checkFields.IsPhoneValid(Phone) == false);
-            //Console.WriteLine("Удачно!");
+                Console.Write("Введите строку подключения: ");
+                ConnectionString = Console.ReadLine();
+                Console.Write("Введите логин: ");
+                Login = Console.ReadLine();
+                Console.Write("Введите пароль: ");
+                Password = Console.ReadLine();
+                Console.Write("Введите дату рождения: ");
+                Date = Console.ReadLine();
+                Console.Write("Введите номер телефона: ");
+                Phone = Console.ReadLine();
+                Console.Write("Введите E-Mail: ");
+                Email = Console.ReadLine();
+                Console.Write("Введите веб-сайт: ");
+                WebSite = Console.ReadLine();
+
+                if (checkFields.IsDatabaseAccessible(ConnectionString) == true)
+                {
+                    if (checkFields.IsUserExists(Login, checkFields.HashPassword(Password)) == true)
+                    {
+                        if (checkFields.IsDateValid(Date) == true)
+                        {
+                            if (checkFields.IsPhoneValid(Phone) == true)
+                            {
+                                if (checkFields.IsEmailValid(Email) == true)
+                                {
+                                    if (checkFields.IsUserRoot() == true)
+                                    {
+                                        if (checkFields.IsWebPageAvailable(WebSite) == true)
+                                        {
+                                            if (checkFields.IsPasswordValid(Password) == true)
+                                            {
+                                                User CurrentUser = new User()
+                                                {
+                                                    Login = Login,
+                                                    Password = checkFields.HashPassword(Password),
+                                                    Email = Email,
+                                                    Phone = Phone,
+                                                    DateOfBirth = Convert.ToDateTime(Date),
+                                                };
+                                                AppData.Context.User.Add(CurrentUser);
+                                                AppData.Context.SaveChanges();
+                                                Console.WriteLine("Пользователь успешно добавлен!");
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine("Пароль не соответствует формату!");
+                                            } 
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Веб-сайт указан некорректно!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Вы не обладаете правами администратора!");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("E-Mail указан некоррктно!");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Телефон указан некорректно!");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Дата указана некорректно!");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Пользователь с таким логином и паролем существует!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Отсутствует подключение к базе данных!");
+                }
+
+            } while (true);
+
             Console.ReadKey();
         }
     }
@@ -47,12 +122,30 @@ namespace HomeWork
     {
         public override string HashPassword(string password)
         {
-            throw new NotImplementedException();
+            var Md5 = MD5.Create();
+            var hash = Md5.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hash);
         }
 
         public override bool IsDatabaseAccessible(string connectionString)
         {
-            throw new NotImplementedException();
+            try
+            {
+                SqlConnection connection = new SqlConnection(connectionString);
+                if (connection.State == System.Data.ConnectionState.Open)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+           
         }
 
         public override bool IsDateValid(string date)
@@ -82,7 +175,60 @@ namespace HomeWork
 
         public override bool IsPasswordValid(string password)
         {
-            throw new NotImplementedException();
+            string symbols = "!№;%:?*()_+=-";
+            bool IsSpecSymbols = false;
+            bool IsWhiteSpace = false;
+            bool IsDate = false;
+            foreach (var item in password)
+            {
+                if (!symbols.Contains(item))
+                {
+                    IsSpecSymbols = true;
+                }
+                else
+                {
+                    IsSpecSymbols = false;
+                } 
+            }
+
+            foreach (var item in password)
+            {
+                if (!Char.IsWhiteSpace(item))
+                {
+                    IsWhiteSpace = true;
+                }
+                else
+                {
+                    IsWhiteSpace = false;
+                }
+            }
+
+            Regex Date = new Regex(@"\d\d[.]\d\d[.]\d\d\d\d");
+            MatchCollection match = Date.Matches(password);
+            if (match.Count > 0)
+            {
+                IsDate = false;
+            }
+            else
+            {
+                IsDate = true;
+            }
+
+            if (password.Length > 22 && password.Length < 25)
+            {
+                if (IsSpecSymbols == true && IsWhiteSpace == true && IsDate == true)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                } 
+            }
+            else
+            {
+                return false;
+            } 
         }
 
         public override bool IsPhoneValid(string phone)
@@ -96,7 +242,7 @@ namespace HomeWork
             else
             {
                 return false;
-            } 
+            }
         }
 
         public override bool IsUserExists(string login, string password)
@@ -118,7 +264,7 @@ namespace HomeWork
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
             {
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
-                IsAdmin = principal.IsInRole(WindowsBuiltInRole.);
+                IsAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
             if (IsAdmin == true)
             {
@@ -132,7 +278,8 @@ namespace HomeWork
 
         public override bool IsWebPageAvailable(string url)
         {
-            throw new NotImplementedException();
+            return Regex.IsMatch(url, @"(http|https)://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?");
+
         }
 
         public override void Log()
